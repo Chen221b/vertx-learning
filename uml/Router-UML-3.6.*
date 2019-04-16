@@ -1,0 +1,18 @@
+@startuml
+interface Handler {
+    handle(E var1) : void
+}
+
+interface Router {
+    static router(Vertx vertx) : Router
+}
+
+Class RouterImpl {
+
+}
+
+Handler <|-- Router
+note right: vertx 3.6.*的实现方式,\nRouter作为Handler的实现,\n可以使用requestHandler(Router)
+Router <|.. RouterImpl
+@enduml
+

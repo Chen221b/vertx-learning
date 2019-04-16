@@ -1,0 +1,19 @@
+@startuml
+interface Handler {
+    handle(E var1) : void
+}
+
+interface Router {
+    static router(Vertx vertx) : Router
+    public accept(
+}
+
+Class RouterImpl {
+    public void accept
+}
+
+
+Router <|.. RouterImpl
+Handler .. RouterImpl
+note right: accept()是对Handler的方法实现,\n使用：requestHandler(Router::accept)
+@enduml

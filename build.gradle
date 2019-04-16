@@ -1,0 +1,27 @@
+subprojects {
+
+
+}
+
+
+
+//plugins {
+//    id 'java'
+//}
+//
+//group 'com.damon.vertx'
+//version '1.0-SNAPSHOT'
+//
+//sourceCompatibility = 1.8
+//
+//repositories {
+//    mavenCentral()
+//}
+//
+//dependencies {
+//    compile "io.vertx:vertx-core:3.4.1"
+//    compile 'io.vertx:vertx-web:3.4.1'
+//
+//    testCompile 'io.vertx:vertx-unit:3.4.1'
+//    testCompile group: 'junit', name: 'junit', version: '4.12'
+//}
