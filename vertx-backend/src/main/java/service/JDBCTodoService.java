@@ -3,10 +3,13 @@ package service;
 import entity.Todo;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.jdbc.JDBCClient;
+import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLConnection;
 
+import java.util.List;
 import java.util.Optional;
 
 public class JDBCTodoService implements TodoService {
@@ -69,7 +72,32 @@ public class JDBCTodoService implements TodoService {
 
     @Override
     public Future<Optional<Todo>> getTodo(String id) {
-        return null;
+        Future<Optional<Todo>> result = Future.future();
+        client.getConnection(res -> {
+            if(res.succeeded()) {
+                SQLConnection connection = res.result();
+                JsonArray params = new JsonArray();
+                params.add(id);
+                connection.queryWithParams(SQL_QUERY, params, get -> {
+
+                    //数据库查询失败
+                    if(get.failed()) {
+                        result.fail(get.cause());
+                    } else {
+                        ResultSet rs = get.result();
+                        List<JsonObject> list = rs.getRows();
+
+                        //查询结果为空，返回Optional.empty()
+                        if(list == null || list.size() == 0) {
+                            result.complete(Optional.empty());
+                        } else {
+                            result.complete(Optional.of(new Todo(list.get(0))));
+                        }
+                    }
+                });
+            }
+        });
+        return result;
     }
 
     @Override

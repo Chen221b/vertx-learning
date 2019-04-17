@@ -22,11 +22,12 @@ public class ApplicationVerticle extends AbstractVerticle {
     private static final int STATE_CODE_OK = 200;
     private static final int STATE_CODE_CREATE = 201;
     private static final int STATE_CODE_BAD_REQUEST = 400;
+    private static final int STATE_CODE_INTERNAL_ERROR = 500;
 
-    private static final String API_GET = "/person/:id";
-    private static final String API_CREATE = "/person";
-    private static final String API_DELETE = "/person:id";
-    private static final String API_UDPATE = "/person";
+    private static final String API_GET = "/todo/:id";
+    private static final String API_CREATE = "/todo";
+    private static final String API_DELETE = "/todo/:id";
+    private static final String API_UDPATE = "/todo";
 
     private TodoService service;
 
@@ -61,13 +62,17 @@ public class ApplicationVerticle extends AbstractVerticle {
 
     public void get(RoutingContext context) {
         String id = context.request().getParam("id");
+        logger.info("Get todo by id : " + id);
         if(id == null) {
             context.response().setStatusCode(STATE_CODE_BAD_REQUEST).end();
         } else {
             Future<Optional<Todo>> future = service.getTodo(id);
             future.setHandler(res -> {
                 if (res.failed()) {
-                    context.response().setStatusCode(STATE_CODE_OK).end("Todo Not Found");
+                    context.response()
+                            .setStatusCode(STATE_CODE_INTERNAL_ERROR)
+                            .end("DB Failed");
+                    return;
                 }
                 if (res.result().isPresent()) {
                     String encoded = Json.encodePrettily(res.result().get());
@@ -75,6 +80,11 @@ public class ApplicationVerticle extends AbstractVerticle {
                             .setStatusCode(STATE_CODE_OK)
                             .putHeader("content-type", "application/json")
                             .end(encoded);
+                    return;
+                } else {
+                    context.response()
+                            .setStatusCode(STATE_CODE_OK)
+                            .end("Todo Not Found");
                 }
             });
         }
